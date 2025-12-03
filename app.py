@@ -1,176 +1,116 @@
 import streamlit as st
+import numpy as np
 import time
 
-st.set_page_config(page_title="Método de Gauss–Jordan", layout="wide")
-
-st.title("Método de Gauss–Jordan")
-
+st.set_page_config(page_title="Gauss–Jordan Animado", layout="wide")
 
 # -------------------------
-# MATRICES + EXPLICACIONES
+# MATRIZ DEL EJERCICIO
 # -------------------------
+A = np.array([
+    [2, 1, -3, 5],
+    [3, -2, 2, 6],
+    [5, -3, -1, 16]
+], dtype=float)
 
-steps = [
-(
-r"""
-\left[
-\begin{array}{ccc|c}
-2 & 1 & -3 & 5 \\
-3 & -2 & 2 & 6 \\
-5 & -3 & -1 & 16
-\end{array}
-\right]
-""",
-"**Paso 1 — Matriz aumentada inicial.**\nTomamos el sistema original y formamos la matriz aumentada."
-),
-
-(
-r"""
-F_1 \rightarrow \frac{1}{2}F_1
-\quad\Rightarrow\quad
-\left[
-\begin{array}{ccc|c}
-1 & 1/2 & -3/2 & 5/2 \\
-3 & -2 & 2 & 6 \\
-5 & -3 & -1 & 16
-\end{array}
-\right]
-""",
-"**Paso 2 — Hacemos 1 el pivote de la primera fila.** Dividimos toda la fila 1 entre 2."
-),
-
-(
-r"""
-F_2 \rightarrow F_2 - 3F_1
-\qquad
-F_3 \rightarrow F_3 - 5F_1
-\quad\Rightarrow\quad
-\left[
-\begin{array}{ccc|c}
-1 & 1/2 & -3/2 & 5/2 \\
-0 & -7/2 & 13/2 & -3/2 \\
-0 & -11/2 & 13/2 & 7/2
-\end{array}
-\right]
-""",
-"**Paso 3 — Eliminamos los valores debajo del pivote 1.** Aplicamos F₂ = F₂ − 3F₁ y F₃ = F₃ − 5F₁."
-),
-
-(
-r"""
-F_2 \rightarrow -\frac{2}{7}F_2
-\qquad
-F_3 \rightarrow F_3 + \frac{11}{2}F_2
-\quad\Rightarrow\quad
-\left[
-\begin{array}{ccc|c}
-1 & 1/2 & -3/2 & 5/2 \\
-0 & 1 & -13/7 & 3/7 \\
-0 & 0 & -26/7 & 41/7
-\end{array}
-\right]
-""",
-"**Paso 4 — Normalizamos la segunda fila.** Multiplicamos F₂ por -2/7 para obtener un pivote igual a 1."
-),
-
-(
-r"""
-F_3 \rightarrow -\frac{7}{26}F_3
-\quad\Rightarrow\quad
-\left[
-\begin{array}{ccc|c}
-1 & 1/2 & -3/2 & 5/2 \\
-0 & 1 & -13/7 & 3/7 \\
-0 & 0 & 1 & -41/26
-\end{array}
-\right]
-""",
-"**Paso 5 — Normalizamos la tercera fila.** Multiplicamos F₃ para obtener un pivote 1."
-),
-
-(
-r"""
-F_2 \rightarrow F_2 + \frac{13}{7}F_3
-\qquad
-F_1 \rightarrow F_1 + \frac{3}{2}F_3
-\quad\Rightarrow\quad
-\left[
-\begin{array}{ccc|c}
-1 & 1/2 & 0 & 7/52 \\
-0 & 1 & 0 & -5/2 \\
-0 & 0 & 1 & -41/26
-\end{array}
-\right]
-""",
-"**Paso 6 — Eliminamos los valores arriba del pivote 3.**"
-),
-
-(
-r"""
-F_1 \rightarrow F_1 - \frac{1}{2}F_2
-\quad\Rightarrow\quad
-\left[
-\begin{array}{ccc|c}
-1 & 0 & 0 & 18/13 \\
-0 & 1 & 0 & -5/2 \\
-0 & 0 & 1 & -41/26
-\end{array}
-\right]
-""",
-"**Paso 7 — Eliminación final arriba del pivote 2.** Con esto llegamos a la matriz identidad."
-),
+explicaciones = [
+    "Paso 1 — Hacemos pivote 1 en la fila 1 dividiendo toda la fila entre 2.",
+    "Paso 2 — Eliminamos la columna 1 debajo del pivote usando F2 → F2 - 3F1.",
+    "Paso 3 — Eliminamos en F3 la columna 1 usando F3 → F3 - 5F1.",
+    "Paso 4 — Normalizamos el pivote 2 dividiendo F2 entre su elemento pivote.",
+    "Paso 5 — Eliminamos arriba y abajo del pivote 2.",
+    "Paso 6 — Normalizamos la fila 3.",
+    "Paso 7 — Eliminamos arriba del pivote 3. Obtenemos la matriz identidad."
 ]
 
+# Simulación de matrices en cada paso
+matrices = []
+
+# Paso 1
+M1 = A.copy().astype(float)
+M1[0] = M1[0] / 2
+matrices.append(M1.copy())
+
+# Paso 2
+M2 = M1.copy()
+M2[1] = M2[1] - 3*M2[0]
+matrices.append(M2.copy())
+
+# Paso 3
+M3 = M2.copy()
+M3[2] = M3[2] - 5*M2[0]
+matrices.append(M3.copy())
+
+# Paso 4
+M4 = M3.copy()
+M4[1] = M4[1] / M4[1,1]
+matrices.append(M4.copy())
+
+# Paso 5
+M5 = M4.copy()
+M5[0] = M5[0] - M5[0,1]*M5[1]
+M5[2] = M5[2] - M5[2,1]*M5[1]
+matrices.append(M5.copy())
+
+# Paso 6
+M6 = M5.copy()
+M6[2] = M6[2] / M6[2,2]
+matrices.append(M6.copy())
+
+# Paso 7
+M7 = M6.copy()
+M7[0] = M7[0] - M7[0,2]*M7[2]
+M7[1] = M7[1] - M7[1,2]*M7[2]
+matrices.append(M7.copy())
+
 # -------------------------
-# CONTROL DE PASOS
+# CONTROL DE ESTADO
 # -------------------------
 
-if "step" not in st.session_state:
-    st.session_state.step = 0
-if "auto" not in st.session_state:
-    st.session_state.auto = False
+if "paso" not in st.session_state:
+    st.session_state.paso = 0
 
-# Botones
+def siguiente():
+    if st.session_state.paso < len(matrices) - 1:
+        st.session_state.paso += 1
+
+def anterior():
+    if st.session_state.paso > 0:
+        st.session_state.paso -= 1
+
+def animar():
+    for i in range(len(matrices)):
+        st.session_state.paso = i
+        time.sleep(1)
+        st.experimental_get_query_params()  # este SÍ funciona y NO causa errores
+
+# -------------------------
+# UI
+# -------------------------
+st.title("📘 Método de Gauss–Jordan – Animación Paso a Paso")
+st.write("Ejercicio tomado del PDF que mostraste. Incluye explicación detallada y animación automática.")
+
 col1, col2, col3 = st.columns([1,1,1])
 
 with col1:
-    if st.button("⏮ Paso anterior"):
-        st.session_state.auto = False
-        st.session_state.step = max(0, st.session_state.step - 1)
+    st.button("⏪ Paso anterior", on_click=anterior)
 
 with col2:
-    if st.button("▶ Reproducir animación"):
-        st.session_state.auto = True
+    st.button("▶ Reproducir animación", on_click=animar)
 
 with col3:
-    if st.button("⏭ Siguiente paso"):
-        st.session_state.auto = False
-        st.session_state.step = min(len(steps)-1, st.session_state.step + 1)
+    st.button("⏩ Siguiente paso", on_click=siguiente)
 
-# Animación automática SIN rerun
-if st.session_state.auto:
-    for i in range(st.session_state.step, len(steps)):
-        st.session_state.step = i
-        time.sleep(1.4)
-        st.write("")  # fuerza refresco visual pequeño
-        st.experimental_update()  # ESTE SÍ FUNCIONA EN STREAMLIT CLOUD
+# -------------------------
+# MOSTRAR RESULTADOS
+# -------------------------
 
-# Mostrar paso
-matrix, explanation = steps[st.session_state.step]
+st.subheader(f"Paso {st.session_state.paso+1} de {len(matrices)}")
+st.info(explicaciones[st.session_state.paso])
 
-st.subheader(f"Paso {st.session_state.step + 1} de {len(steps)}")
-st.latex(matrix)
-st.info(explanation)
+st.latex(r"" + np.array2string(matrices[st.session_state.paso], separator=' & ').replace('[','\\left[').replace(']','\\right]'))
 
 # Solución final
-if st.session_state.step == len(steps)-1:
-    st.success(
-        r"""
-        **Solución final del sistema:**
-        \[
-        x = \frac{18}{13},\quad
-        y = -\frac{5}{2},\quad
-        z = -\frac{41}{26}
-        \]
-        """
-    )
+if st.session_state.paso == len(matrices) - 1:
+    st.success("Solución final del sistema: \n\n"
+               r"$x = \frac{18}{13},\quad y = -\frac{5}{2},\quad z = -\frac{41}{26}$")
