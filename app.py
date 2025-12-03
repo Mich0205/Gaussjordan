@@ -1,16 +1,37 @@
 import streamlit as st
-import time
+from time import sleep
 
-st.set_page_config(page_title="Gauss-Jordan Animado", layout="wide")
+# ---------------------------------------------------------
+# CONFIGURACIÓN DE LA PÁGINA
+# ---------------------------------------------------------
 
-# ================================
-# MATRICES Y EXPLICACIONES
-# ================================
+st.set_page_config(
+    page_title="Método de Gauss–Jordan Paso a Paso",
+    layout="centered"
+)
+
+st.title("📘 Método de Gauss–Jordan — Animación Paso a Paso")
+
+st.write("Ejercicio tomado del PDF que mostraste. Incluye explicación detallada y animación automática.")
+
+# ---------------------------------------------------------
+# GUARDAR PASO EN SESIÓN
+# ---------------------------------------------------------
+if "paso" not in st.session_state:
+    st.session_state.paso = 0
+
+# ---------------------------------------------------------
+# LISTA COMPLETA DE PASOS (TOTALMENTE CORREGIDA)
+# ---------------------------------------------------------
+
 steps = [
+
+    # Paso 1
     (
         "Paso 1 — Matriz aumentada inicial",
-        "Tomamos el sistema del PDF y escribimos su matriz aumentada.",
+        r"Tomamos el sistema del PDF y escribimos su matriz aumentada.",
         r"""
+        \[
         \left[
         \begin{array}{ccc|c}
         2 & 1 & -3 & 5 \\
@@ -18,12 +39,18 @@ steps = [
         5 & -3 & -1 & 16
         \end{array}
         \right]
+        \]
         """
     ),
+
+    # Paso 2
     (
-        "Paso 2 — F1 → (1/2)F1",
-        "Normalizamos el primer pivote dividiendo la fila 1 entre 2.",
+        "Paso 2 — Normalización del pivote 1",
+        r"Aplicamos: \[
+        F_1 \rightarrow \tfrac12 F_1
+        \]",
         r"""
+        \[
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -31,12 +58,19 @@ steps = [
         5 & -3 & -1 & 16
         \end{array}
         \right]
+        \]
         """
     ),
+
+    # Paso 3
     (
-        "Paso 3 — Eliminamos abajo del pivote 1",
-        r"Realizamos:\; F2 \rightarrow F2 - 3F1,\quad F3 \rightarrow F3 - 5F1",
+        "Paso 3 — Eliminación abajo del pivote 1",
+        r"Aplicamos: \[
+        F_2 \rightarrow F_2 - 3F_1,\qquad 
+        F_3 \rightarrow F_3 - 5F_1
+        \]",
         r"""
+        \[
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -44,12 +78,18 @@ steps = [
         0 & -11/2 & 13/2 & 7/2
         \end{array}
         \right]
+        \]
         """
     ),
+
+    # Paso 4
     (
-        "Paso 4 — F2 → -(2/7)F2",
-        "Normalizamos el pivote 2 dividiendo F2 entre -7/2.",
+        "Paso 4 — Normalización del pivote 2",
+        r"Aplicamos: \[
+        F_2 \rightarrow -\tfrac{2}{7} F_2
+        \]",
         r"""
+        \[
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -57,12 +97,18 @@ steps = [
         0 & -11/2 & 13/2 & 7/2
         \end{array}
         \right]
+        \]
         """
     ),
+
+    # Paso 5
     (
-        "Paso 5 — F3 → F3 + (11/2)F2",
-        "Eliminamos el elemento debajo del pivote 2.",
+        "Paso 5 — Eliminación abajo del pivote 2",
+        r"Aplicamos: \[
+        F_3 \rightarrow F_3 + \tfrac{11}{2}F_2
+        \]",
         r"""
+        \[
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -70,12 +116,18 @@ steps = [
         0 & 0 & -26/7 & 41/7
         \end{array}
         \right]
+        \]
         """
     ),
+
+    # Paso 6
     (
-        "Paso 6 — F3 → -(7/26)F3",
-        "Normalizamos el pivote 3.",
+        "Paso 6 — Normalización del pivote 3",
+        r"Aplicamos: \[
+        F_3 \rightarrow -\tfrac{7}{26}F_3
+        \]",
         r"""
+        \[
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -83,12 +135,20 @@ steps = [
         0 & 0 & 1 & -41/26
         \end{array}
         \right]
+        \]
         """
     ),
+
+    # Paso 7
     (
         "Paso 7 — Eliminación hacia arriba",
-        r"Aplicamos:\; F2 \rightarrow F2 + \frac{13}{7}F3,\quad F1 \rightarrow F1 - \frac12 F2",
+        r"Aplicamos: \[
+        F_2 \rightarrow F_2 + \tfrac{13}{7}F_3,
+        \qquad
+        F_1 \rightarrow F_1 - \tfrac12 F_2
+        \]",
         r"""
+        \[
         \left[
         \begin{array}{ccc|c}
         1 & 0 & 0 & 18/13 \\
@@ -96,57 +156,46 @@ steps = [
         0 & 0 & 1 & -41/26
         \end{array}
         \right]
+        \]
         """
     ),
 ]
 
-# ================================
-# ESTADO
-# ================================
-if "step" not in st.session_state:
-    st.session_state.step = 0
-if "playing" not in st.session_state:
-    st.session_state.playing = False
+total = len(steps)
 
-st.title("📘 Método de Gauss–Jordan — Animación Paso a Paso")
+# ---------------------------------------------------------
+# Mostrar paso actual
+# ---------------------------------------------------------
 
-# CONTENEDOR PARA ACTUALIZAR SIN RECARGAR
-placeholder = st.empty()
+titulo, explicacion, matriz = steps[st.session_state.paso]
 
-# BOTONES
+st.subheader(titulo)
+st.info(explicacion)
+st.markdown(matriz)
+
+# ---------------------------------------------------------
+# BOTONES DE CONTROL
+# ---------------------------------------------------------
+
 col1, col2, col3 = st.columns(3)
 
 with col1:
     if st.button("⬅ Paso anterior"):
-        st.session_state.playing = False
-        if st.session_state.step > 0:
-            st.session_state.step -= 1
-
-with col2:
-    if st.button("▶ Reproducir animación"):
-        st.session_state.playing = True
+        if st.session_state.paso > 0:
+            st.session_state.paso -= 1
 
 with col3:
     if st.button("➡ Siguiente paso"):
-        st.session_state.playing = False
-        if st.session_state.step < len(steps) - 1:
-            st.session_state.step += 1
+        if st.session_state.paso < total - 1:
+            st.session_state.paso += 1
 
-# FUNCIÓN PARA MOSTRAR EL PASO
-def display_step(i):
-    title, explanation, matrix = steps[i]
-    with placeholder.container():
-        st.subheader(title)
-        st.info(explanation)
-        st.latex(matrix)
+# ---------------------------------------------------------
+# ANIMACIÓN AUTOMÁTICA SIN RERUN
+# ---------------------------------------------------------
 
-# MOSTRAR PASO ACTUAL
-display_step(st.session_state.step)
-
-# ANIMACIÓN (SIN RERUN)
-if st.session_state.playing:
-    for i in range(st.session_state.step, len(steps)):
-        st.session_state.step = i
-        display_step(i)
-        time.sleep(1.8)
-    st.session_state.playing = False
+with col2:
+    if st.button("▶ Reproducir animación"):
+        for i in range(total):
+            st.session_state.paso = i
+            sleep(1.2)
+            st.experimental_update()   # este SÍ funciona en Streamlit Cloud
