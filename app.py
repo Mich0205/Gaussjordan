@@ -1,36 +1,28 @@
 import streamlit as st
 from time import sleep
 
-# ---------------------------------------------------------
-# CONFIGURACIÓN DE LA PÁGINA
-# ---------------------------------------------------------
-
-st.set_page_config(
-    page_title="Método de Gauss–Jordan Paso a Paso",
-    layout="centered"
-)
+st.set_page_config(page_title="Método de Gauss–Jordan", layout="centered")
 
 st.title("📘 Método de Gauss–Jordan — Animación Paso a Paso")
-
 st.write("Ejercicio tomado del PDF que mostraste. Incluye explicación detallada y animación automática.")
 
-# ---------------------------------------------------------
-# GUARDAR PASO EN SESIÓN
-# ---------------------------------------------------------
+# Guardar paso
 if "paso" not in st.session_state:
     st.session_state.paso = 0
 
-# ---------------------------------------------------------
-# LISTA COMPLETA DE PASOS (TOTALMENTE CORREGIDA)
-# ---------------------------------------------------------
+# ============================
+#  PASOS CORREGIDOS
+# ============================
 
 steps = [
 
     # Paso 1
     (
         "Paso 1 — Matriz aumentada inicial",
-        r"Tomamos el sistema del PDF y escribimos su matriz aumentada.",
-        r"""
+        """
+        Tomamos el sistema del PDF y escribimos su matriz aumentada.
+        """,
+        """
         \[
         \left[
         \begin{array}{ccc|c}
@@ -46,10 +38,14 @@ steps = [
     # Paso 2
     (
         "Paso 2 — Normalización del pivote 1",
-        r"Aplicamos: \[
+        """
+        Aplicamos:
+
+        \[
         F_1 \rightarrow \tfrac12 F_1
-        \]",
-        r"""
+        \]
+        """,
+        """
         \[
         \left[
         \begin{array}{ccc|c}
@@ -65,11 +61,15 @@ steps = [
     # Paso 3
     (
         "Paso 3 — Eliminación abajo del pivote 1",
-        r"Aplicamos: \[
-        F_2 \rightarrow F_2 - 3F_1,\qquad 
+        """
+        Aplicamos:
+
+        \[
+        F_2 \rightarrow F_2 - 3F_1, \qquad
         F_3 \rightarrow F_3 - 5F_1
-        \]",
-        r"""
+        \]
+        """,
+        """
         \[
         \left[
         \begin{array}{ccc|c}
@@ -85,10 +85,14 @@ steps = [
     # Paso 4
     (
         "Paso 4 — Normalización del pivote 2",
-        r"Aplicamos: \[
-        F_2 \rightarrow -\tfrac{2}{7} F_2
-        \]",
-        r"""
+        """
+        Aplicamos:
+
+        \[
+        F_2 \rightarrow -\frac{2}{7} F_2
+        \]
+        """,
+        """
         \[
         \left[
         \begin{array}{ccc|c}
@@ -104,10 +108,14 @@ steps = [
     # Paso 5
     (
         "Paso 5 — Eliminación abajo del pivote 2",
-        r"Aplicamos: \[
-        F_3 \rightarrow F_3 + \tfrac{11}{2}F_2
-        \]",
-        r"""
+        """
+        Aplicamos:
+
+        \[
+        F_3 \rightarrow F_3 + \frac{11}{2} F_2
+        \]
+        """,
+        """
         \[
         \left[
         \begin{array}{ccc|c}
@@ -123,10 +131,14 @@ steps = [
     # Paso 6
     (
         "Paso 6 — Normalización del pivote 3",
-        r"Aplicamos: \[
-        F_3 \rightarrow -\tfrac{7}{26}F_3
-        \]",
-        r"""
+        """
+        Aplicamos:
+
+        \[
+        F_3 \rightarrow -\frac{7}{26} F_3
+        \]
+        """,
+        """
         \[
         \left[
         \begin{array}{ccc|c}
@@ -142,12 +154,16 @@ steps = [
     # Paso 7
     (
         "Paso 7 — Eliminación hacia arriba",
-        r"Aplicamos: \[
-        F_2 \rightarrow F_2 + \tfrac{13}{7}F_3,
+        """
+        Aplicamos:
+
+        \[
+        F_2 \rightarrow F_2 + \frac{13}{7} F_3,
         \qquad
-        F_1 \rightarrow F_1 - \tfrac12 F_2
-        \]",
-        r"""
+        F_1 \rightarrow F_1 - \frac12 F_2
+        \]
+        """,
+        """
         \[
         \left[
         \begin{array}{ccc|c}
@@ -163,9 +179,9 @@ steps = [
 
 total = len(steps)
 
-# ---------------------------------------------------------
-# Mostrar paso actual
-# ---------------------------------------------------------
+# =============================
+#  MOSTRAR EL PASO
+# =============================
 
 titulo, explicacion, matriz = steps[st.session_state.paso]
 
@@ -173,9 +189,9 @@ st.subheader(titulo)
 st.info(explicacion)
 st.markdown(matriz)
 
-# ---------------------------------------------------------
-# BOTONES DE CONTROL
-# ---------------------------------------------------------
+# =============================
+#  BOTONES
+# =============================
 
 col1, col2, col3 = st.columns(3)
 
@@ -189,13 +205,9 @@ with col3:
         if st.session_state.paso < total - 1:
             st.session_state.paso += 1
 
-# ---------------------------------------------------------
-# ANIMACIÓN AUTOMÁTICA SIN RERUN
-# ---------------------------------------------------------
-
 with col2:
     if st.button("▶ Reproducir animación"):
         for i in range(total):
             st.session_state.paso = i
             sleep(1.2)
-            st.experimental_update()   # este SÍ funciona en Streamlit Cloud
+            st.experimental_update()
