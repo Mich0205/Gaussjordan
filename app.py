@@ -1,16 +1,16 @@
 import streamlit as st
-from fractions import Fraction
+import time
 
-st.set_page_config(page_title="Gauss–Jordan Animado", layout="wide")
+st.set_page_config(page_title="Gauss-Jordan Animado", layout="wide")
 
-# ===============================
-# MATRICES DEL EJERCICIO
-# ===============================
+# ================================
+# MATRICES Y EXPLICACIONES
+# ================================
 steps = [
-    {
-        "title": "Paso 1 — Matriz aumentada inicial",
-        "explanation": "Tomamos el sistema del PDF y escribimos su matriz aumentada.",
-        "matrix": r"""
+    (
+        "Paso 1 — Matriz aumentada inicial",
+        "Tomamos el sistema del PDF y escribimos su matriz aumentada.",
+        r"""
         \left[
         \begin{array}{ccc|c}
         2 & 1 & -3 & 5 \\
@@ -19,11 +19,11 @@ steps = [
         \end{array}
         \right]
         """
-    },
-    {
-        "title": "Paso 2 — F1 → (1/2)F1",
-        "explanation": "Normalizamos el primer pivote dividiendo la fila 1 entre 2.",
-        "matrix": r"""
+    ),
+    (
+        "Paso 2 — F1 → (1/2)F1",
+        "Normalizamos el primer pivote dividiendo la fila 1 entre 2.",
+        r"""
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -32,11 +32,11 @@ steps = [
         \end{array}
         \right]
         """
-    },
-    {
-        "title": "Paso 3 — Eliminamos abajo del pivote 1",
-        "explanation": r"Aplicamos: F2 → F2 - 3F1 \quad y \quad F3 → F3 - 5F1",
-        "matrix": r"""
+    ),
+    (
+        "Paso 3 — Eliminamos abajo del pivote 1",
+        r"Realizamos:\; F2 \rightarrow F2 - 3F1,\quad F3 \rightarrow F3 - 5F1",
+        r"""
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -45,11 +45,11 @@ steps = [
         \end{array}
         \right]
         """
-    },
-    {
-        "title": "Paso 4 — F2 → -(2/7)F2",
-        "explanation": "Normalizamos el pivote 2 dividiendo F2 entre su entrada pivote (-7/2).",
-        "matrix": r"""
+    ),
+    (
+        "Paso 4 — F2 → -(2/7)F2",
+        "Normalizamos el pivote 2 dividiendo F2 entre -7/2.",
+        r"""
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -58,11 +58,11 @@ steps = [
         \end{array}
         \right]
         """
-    },
-    {
-        "title": "Paso 5 — F3 → F3 + (11/2)F2",
-        "explanation": "Eliminamos el término debajo del pivote 2.",
-        "matrix": r"""
+    ),
+    (
+        "Paso 5 — F3 → F3 + (11/2)F2",
+        "Eliminamos el elemento debajo del pivote 2.",
+        r"""
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -71,11 +71,11 @@ steps = [
         \end{array}
         \right]
         """
-    },
-    {
-        "title": "Paso 6 — F3 → (-7/26)F3",
-        "explanation": "Normalizamos el pivote 3.",
-        "matrix": r"""
+    ),
+    (
+        "Paso 6 — F3 → -(7/26)F3",
+        "Normalizamos el pivote 3.",
+        r"""
         \left[
         \begin{array}{ccc|c}
         1 & 1/2 & -3/2 & 5/2 \\
@@ -84,11 +84,11 @@ steps = [
         \end{array}
         \right]
         """
-    },
-    {
-        "title": "Paso 7 — Eliminación hacia arriba",
-        "explanation": r"Aplicamos: F2 → F2 + (13/7)F3 \quad y \quad F1 → F1 - (1/2)F2",
-        "matrix": r"""
+    ),
+    (
+        "Paso 7 — Eliminación hacia arriba",
+        r"Aplicamos:\; F2 \rightarrow F2 + \frac{13}{7}F3,\quad F1 \rightarrow F1 - \frac12 F2",
+        r"""
         \left[
         \begin{array}{ccc|c}
         1 & 0 & 0 & 18/13 \\
@@ -97,49 +97,56 @@ steps = [
         \end{array}
         \right]
         """
-    }
+    ),
 ]
 
-# ===============================
-# INTERFAZ
-# ===============================
-
-st.title("📘 Método de Gauss–Jordan — Animación Paso a Paso")
-st.write("Ejercicio tomado del PDF que mostraste (exactamente el mismo procedimiento).")
-
-# Estado persistente
+# ================================
+# ESTADO
+# ================================
 if "step" not in st.session_state:
     st.session_state.step = 0
-if "auto" not in st.session_state:
-    st.session_state.auto = False
+if "playing" not in st.session_state:
+    st.session_state.playing = False
 
-# Botones
-cols = st.columns(3)
-with cols[0]:
+st.title("📘 Método de Gauss–Jordan — Animación Paso a Paso")
+
+# CONTENEDOR PARA ACTUALIZAR SIN RECARGAR
+placeholder = st.empty()
+
+# BOTONES
+col1, col2, col3 = st.columns(3)
+
+with col1:
     if st.button("⬅ Paso anterior"):
+        st.session_state.playing = False
         if st.session_state.step > 0:
             st.session_state.step -= 1
-with cols[1]:
+
+with col2:
     if st.button("▶ Reproducir animación"):
-        st.session_state.auto = True
-with cols[2]:
+        st.session_state.playing = True
+
+with col3:
     if st.button("➡ Siguiente paso"):
-        if st.session_state.step < len(steps)-1:
+        st.session_state.playing = False
+        if st.session_state.step < len(steps) - 1:
             st.session_state.step += 1
 
-# Mostrar paso actual
-cp = st.session_state.step
-st.subheader(f"Paso {cp+1} de {len(steps)}: {steps[cp]['title']}")
-st.info(steps[cp]["explanation"])
-st.latex(steps[cp]["matrix"])
+# FUNCIÓN PARA MOSTRAR EL PASO
+def display_step(i):
+    title, explanation, matrix = steps[i]
+    with placeholder.container():
+        st.subheader(title)
+        st.info(explanation)
+        st.latex(matrix)
 
-# Mostrar solución al final
-if cp == len(steps)-1:
-    st.success(r"Solución final: \quad x=\frac{18}{13},\; y=-\frac52,\; z=-\frac{41}{26}")
+# MOSTRAR PASO ACTUAL
+display_step(st.session_state.step)
 
-# Animación automática
-if st.session_state.auto and st.session_state.step < len(steps)-1:
-    import time
-    time.sleep(1.5)  # Velocidad
-    st.session_state.step += 1
-    st.experimental_rerun()
+# ANIMACIÓN (SIN RERUN)
+if st.session_state.playing:
+    for i in range(st.session_state.step, len(steps)):
+        st.session_state.step = i
+        display_step(i)
+        time.sleep(1.8)
+    st.session_state.playing = False
