@@ -3,8 +3,8 @@ import time
 
 st.set_page_config(page_title="Método de Gauss–Jordan", layout="wide")
 
-st.title("📘 Método de Gauss–Jordan – Animación Paso a Paso")
-st.write("Ejercicio tomado del PDF que mostraste. Incluye explicación detallada y animación automática.")
+st.title("Método de Gauss–Jordan")
+
 
 # -------------------------
 # MATRICES + EXPLICACIONES
@@ -36,7 +36,7 @@ F_1 \rightarrow \frac{1}{2}F_1
 \end{array}
 \right]
 """,
-"**Paso 2 — Hacemos 1 el pivote de la primera fila.**\nDividimos toda la fila 1 entre 2 para obtener un 1 en la posición (1,1)."
+"**Paso 2 — Hacemos 1 el pivote de la primera fila.** Dividimos toda la fila 1 entre 2."
 ),
 
 (
@@ -53,7 +53,7 @@ F_3 \rightarrow F_3 - 5F_1
 \end{array}
 \right]
 """,
-"**Paso 3 — Hacemos ceros debajo del pivote 1.**\nAplicamos:\n\n- F₂ = F₂ − 3F₁\n- F₃ = F₃ − 5F₁"
+"**Paso 3 — Eliminamos los valores debajo del pivote 1.** Aplicamos F₂ = F₂ − 3F₁ y F₃ = F₃ − 5F₁."
 ),
 
 (
@@ -70,7 +70,7 @@ F_3 \rightarrow F_3 + \frac{11}{2}F_2
 \end{array}
 \right]
 """,
-"**Paso 4 — Normalizamos la segunda fila.**\nMultiplicamos F₂ por -2/7 para obtener 1 en el pivote de la segunda fila."
+"**Paso 4 — Normalizamos la segunda fila.** Multiplicamos F₂ por -2/7 para obtener un pivote igual a 1."
 ),
 
 (
@@ -85,7 +85,7 @@ F_3 \rightarrow -\frac{7}{26}F_3
 \end{array}
 \right]
 """,
-"**Paso 5 — Normalizamos la tercera fila.**\nMultiplicamos F₃ para obtener 1 en el pivote de la fila 3."
+"**Paso 5 — Normalizamos la tercera fila.** Multiplicamos F₃ para obtener un pivote 1."
 ),
 
 (
@@ -102,7 +102,7 @@ F_1 \rightarrow F_1 + \frac{3}{2}F_3
 \end{array}
 \right]
 """,
-"**Paso 6 — Eliminamos los valores por encima del pivote 3.**\nHacemos ceros arriba del pivote en la columna 3."
+"**Paso 6 — Eliminamos los valores arriba del pivote 3.**"
 ),
 
 (
@@ -117,12 +117,12 @@ F_1 \rightarrow F_1 - \frac{1}{2}F_2
 \end{array}
 \right]
 """,
-"**Paso 7 — Eliminamos el término sobre el pivote 2.**\nCon eso obtenemos la matriz identidad a la izquierda."
-)
+"**Paso 7 — Eliminación final arriba del pivote 2.** Con esto llegamos a la matriz identidad."
+),
 ]
 
 # -------------------------
-# ANIMACIÓN
+# CONTROL DE PASOS
 # -------------------------
 
 if "step" not in st.session_state:
@@ -130,28 +130,32 @@ if "step" not in st.session_state:
 if "auto" not in st.session_state:
     st.session_state.auto = False
 
+# Botones
 col1, col2, col3 = st.columns([1,1,1])
 
 with col1:
-    if st.button("⏮ Paso anterior", use_container_width=True):
+    if st.button("⏮ Paso anterior"):
+        st.session_state.auto = False
         st.session_state.step = max(0, st.session_state.step - 1)
 
 with col2:
-    if st.button("▶ Reproducir animación", use_container_width=True):
+    if st.button("▶ Reproducir animación"):
         st.session_state.auto = True
 
 with col3:
-    if st.button("⏭ Siguiente paso", use_container_width=True):
+    if st.button("⏭ Siguiente paso"):
+        st.session_state.auto = False
         st.session_state.step = min(len(steps)-1, st.session_state.step + 1)
 
-# Animación automática
+# Animación automática SIN rerun
 if st.session_state.auto:
     for i in range(st.session_state.step, len(steps)):
         st.session_state.step = i
-        st.experimental_rerun()
-        time.sleep(1.2)
+        time.sleep(1.4)
+        st.write("")  # fuerza refresco visual pequeño
+        st.experimental_update()  # ESTE SÍ FUNCIONA EN STREAMLIT CLOUD
 
-# Mostrar matriz y explicación
+# Mostrar paso
 matrix, explanation = steps[st.session_state.step]
 
 st.subheader(f"Paso {st.session_state.step + 1} de {len(steps)}")
@@ -164,8 +168,8 @@ if st.session_state.step == len(steps)-1:
         r"""
         **Solución final del sistema:**
         \[
-        x = \frac{18}{13},\qquad
-        y = -\frac{5}{2},\qquad
+        x = \frac{18}{13},\quad
+        y = -\frac{5}{2},\quad
         z = -\frac{41}{26}
         \]
         """
