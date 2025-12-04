@@ -9,7 +9,7 @@ st.set_page_config(page_title="Gauss-Jordan Animado", layout="wide")
 steps = [
     (
         "Paso 1 — Matriz aumentada inicial",
-        "Tomamos el sistema del PDF y escribimos su matriz aumentada.",
+        "Tomamos el sistema,escribimos su matriz aumentada.",
         r"""
         \left[
         \begin{array}{ccc|c}
@@ -150,3 +150,4 @@ if st.session_state.playing:
         display_step(i)
         time.sleep(1.8)
     st.session_state.playing = False
+
