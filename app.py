@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 
-st.set_page_config(page_title="Gauss-Jordan Animado", layout="wide")
+st.set_page_config(page_title="Gauss-Jordan", layout="wide")
 
 # ================================
 # MATRICES Y EXPLICACIONES
@@ -150,4 +150,5 @@ if st.session_state.playing:
         display_step(i)
         time.sleep(1.8)
     st.session_state.playing = False
+
 
