@@ -1,4 +1,10 @@
 streamlit
+numpy
+matplotlib
+imageio
+Pillow
+
+
 
 
 
